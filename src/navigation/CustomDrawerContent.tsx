@@ -11,12 +11,15 @@ import {
 } from '@react-navigation/drawer';
 
 import { Ionicons } from '@expo/vector-icons';
+import { useIoT } from '../context/IoTContext';
 
 export default function CustomDrawerContent(props: any) {
+    const { darkMode } = useIoT();
+
     return (
         <DrawerContentScrollView
             {...props}
-            contentContainerStyle={styles.container}
+            contentContainerStyle={[styles.container, darkMode && styles.darkContainer]}
         >
 
             {/* Header */}
@@ -26,14 +29,15 @@ export default function CustomDrawerContent(props: any) {
                     <Ionicons
                         name="hardware-chip-outline"
                         size={40}
+                        color={darkMode ? '#b8c7d9' : '#1f2937'}
                     />
                 </View>
 
-                <Text style={styles.title}>
+                <Text style={[styles.title, darkMode && styles.darkText]}>
                     IoT Home
                 </Text>
 
-                <Text style={styles.subtitle}>
+                <Text style={[styles.subtitle, darkMode && styles.darkTextSecondary]}>
                     Smart Environment
                 </Text>
 
@@ -75,6 +79,18 @@ const styles = StyleSheet.create({
 
     menu: {
         marginTop: 10,
+    },
+
+    darkContainer: {
+        backgroundColor: '#101820',
+    },
+
+    darkText: {
+        color: '#f4f7fb',
+    },
+
+    darkTextSecondary: {
+        color: '#b8c7d9',
     },
 
 });

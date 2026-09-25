@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useIoT } from '../../context/IoTContext';
@@ -13,60 +13,67 @@ export default function DashboardScreen() {
     //     }, {} as Record<number, boolean>)
     // );
 
-    const { devices, 
-        sensors, 
-        toggleDevice } = useIoT();
+    const {
+        devices,
+        sensors,
+        toggleDevice,
+        gatewayConnected,
+        updatingDeviceId,
+        darkMode,
+    } = useIoT();
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, darkMode && styles.darkContainer]}>
 
-            <Text style={styles.greeting}>
+            <Text style={[styles.greeting, darkMode && styles.darkText]}>
                 Good evening
             </Text>
 
-            <Text style={styles.title}>
+            <Text style={[styles.title, darkMode && styles.darkText]}>
                 IoT Dashboard
             </Text>
 
             <View style={styles.sensorRow}>
 
-                <View style={styles.sensorCard}>
+                <View style={[styles.sensorCard, darkMode && styles.darkCard]}>
                     <View style={styles.sensorHeader}>
                         <Ionicons
                             name="water-outline"
                             size={22}
+                            color={darkMode ? '#b8c7d9' : '#1f2937'}
                         />
 
-                        <Text style={styles.sensorLabel}>
+                        <Text style={[styles.sensorLabel, darkMode && styles.darkText]}>
                             Temperature
                         </Text>
                     </View>
 
-                    <Text style={styles.sensorValue}>
-                        {sensors.temperature}°C
+                    <Text style={[styles.sensorValue, darkMode && styles.darkText]}>
+                        {sensors ? `${sensors.temperature}°C` : '--'}
                     </Text>
                 </View>
 
-                <View style={styles.sensorCard}>
+                <View style={[styles.sensorCard, darkMode && styles.darkCard]}>
                     <View style={styles.sensorHeader}>
                         <Ionicons
                             name="water-outline"
                             size={22}
+                            color={darkMode ? '#b8c7d9' : '#1f2937'}
                         />
 
-                        <Text style={styles.sensorLabel}>
+                        <Text style={[styles.sensorLabel, darkMode && styles.darkText]}>
                             Humidity
                         </Text>
                     </View>
 
-                    <Text style={styles.sensorValue}>
-                        {sensors.humidity}%
+                    <Text style={[styles.sensorValue, darkMode && styles.darkText]}>
+                        {sensors ? `${sensors.humidity}%` : '--'}
                     </Text>
                 </View>
 
             </View>
 
-            <Text style={styles.sectionTitle}>
+            <Text style={[styles.sectionTitle, darkMode && styles.darkText]}>
                 Device Status
             </Text>
 
@@ -101,7 +108,7 @@ export default function DashboardScreen() {
 
                 <View
                     key={device.id}
-                    style={styles.deviceCard}
+                    style={[styles.deviceCard, darkMode && styles.darkCard]}
                 >
 
                     <View style={styles.deviceInfo}>
@@ -109,28 +116,28 @@ export default function DashboardScreen() {
                         <Ionicons
                             name={device.icon}
                             size={28}
-                            style={styles.deviceIcon}
+                            style={[styles.deviceIcon, darkMode && styles.darkIcon]}
                         />
 
                         <View>
-                            <Text style={styles.deviceName}>
+                            <Text style={[styles.deviceName, darkMode && styles.darkText]}>
                                 {device.name}
                             </Text>
 
-                            <Text style={styles.deviceType}>
-                                <Text style={styles.deviceState}>
-                                    {device.status ? 'ON' : 'OFF'}
-                                </Text>
+                            <Text style={[styles.deviceType, darkMode && styles.darkTextSecondary]}>
+                                {device.type} - {device.status ? 'ON' : 'OFF'}
                             </Text>
+                            {updatingDeviceId === device.id && (
+                                <Text style={[styles.deviceState, darkMode && styles.darkTextSecondary]}>Updating...</Text>
+                            )}
                         </View>
 
                     </View>
 
                     <Switch
                         value={device.status}
-                        onValueChange={(value) => {
-                            toggleDevice(device.id, value);
-                        }}
+                        disabled={!gatewayConnected || updatingDeviceId === device.id}
+                        onValueChange={(value) => void toggleDevice(device.id, value)}
                     />
 
                 </View>
@@ -230,6 +237,26 @@ const styles = StyleSheet.create({
     deviceState:{
 
     }
+
+    ,darkContainer: {
+        backgroundColor: '#101820',
+    },
+
+    darkCard: {
+        backgroundColor: '#1d2a36',
+    },
+
+    darkText: {
+        color: '#f4f7fb',
+    },
+
+    darkTextSecondary: {
+        color: '#b8c7d9',
+    },
+
+    darkIcon: {
+        color: '#b8c7d9',
+    },
 
 
 });

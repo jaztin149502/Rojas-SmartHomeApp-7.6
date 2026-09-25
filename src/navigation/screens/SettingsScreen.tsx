@@ -5,40 +5,50 @@ import {
   StyleSheet,
   ScrollView,
   Switch,
+  Button,
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
+import { useIoT } from '../../context/IoTContext';
 
 export default function SettingsScreen() {
 
+  const {
+    gatewayConnected,
+    gatewayConnecting,
+    connectToGateway,
+    disconnectFromGateway,
+    darkMode,
+    toggleDarkMode,
+  } = useIoT();
+
   const [notifications, setNotifications] = useState(true);
   const [autoConnect, setAutoConnect] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, darkMode && styles.darkContainer]}>
 
       {/* Header */}
 
-      <Text style={styles.title}>
+      <Text style={[styles.title, darkMode && styles.darkText]}>
         Settings
       </Text>
 
-      <Text style={styles.subtitle}>
+      <Text style={[styles.subtitle, darkMode && styles.darkTextSecondary]}>
         Configure your IoT application
       </Text>
 
 
       {/* General Settings */}
 
-      <Text style={styles.sectionTitle}>
+      <Text style={[styles.sectionTitle, darkMode && styles.darkText]}>
         General
       </Text>
 
 
       {/* Notifications */}
 
-      <View style={styles.settingCard}>
+      <View style={[styles.settingCard, darkMode && styles.darkCard]}>
 
         <View style={styles.settingInfo}>
 
@@ -49,11 +59,11 @@ export default function SettingsScreen() {
 
           <View style={styles.settingText}>
 
-            <Text style={styles.settingName}>
+            <Text style={[styles.settingName, darkMode && styles.darkText]}>
               Notifications
             </Text>
 
-            <Text style={styles.settingDescription}>
+            <Text style={[styles.settingDescription, darkMode && styles.darkTextSecondary]}>
               Receive alerts from your IoT devices
             </Text>
 
@@ -71,7 +81,7 @@ export default function SettingsScreen() {
 
       {/* Auto Connect */}
 
-      <View style={styles.settingCard}>
+      <View style={[styles.settingCard, darkMode && styles.darkCard]}>
 
         <View style={styles.settingInfo}>
 
@@ -82,11 +92,11 @@ export default function SettingsScreen() {
 
           <View style={styles.settingText}>
 
-            <Text style={styles.settingName}>
+            <Text style={[styles.settingName, darkMode && styles.darkText]}>
               Auto Connect
             </Text>
 
-            <Text style={styles.settingDescription}>
+            <Text style={[styles.settingDescription, darkMode && styles.darkTextSecondary]}>
               Automatically connect to the IoT gateway
             </Text>
 
@@ -104,7 +114,7 @@ export default function SettingsScreen() {
 
       {/* Dark Mode */}
 
-      <View style={styles.settingCard}>
+      <View style={[styles.settingCard, darkMode && styles.darkCard]}>
 
         <View style={styles.settingInfo}>
 
@@ -115,11 +125,11 @@ export default function SettingsScreen() {
 
           <View style={styles.settingText}>
 
-            <Text style={styles.settingName}>
+            <Text style={[styles.settingName, darkMode && styles.darkText]}>
               Dark Mode
             </Text>
 
-            <Text style={styles.settingDescription}>
+            <Text style={[styles.settingDescription, darkMode && styles.darkTextSecondary]}>
               Use a darker application appearance
             </Text>
 
@@ -129,7 +139,7 @@ export default function SettingsScreen() {
 
         <Switch
           value={darkMode}
-          onValueChange={setDarkMode}
+          onValueChange={toggleDarkMode}
         />
 
       </View>
@@ -137,12 +147,12 @@ export default function SettingsScreen() {
 
       {/* Connection */}
 
-      <Text style={styles.sectionTitle}>
+      <Text style={[styles.sectionTitle, darkMode && styles.darkText]}>
         Connection
       </Text>
 
 
-      <View style={styles.connectionCard}>
+      <View style={[styles.connectionCard, darkMode && styles.darkCard]}>
 
         <View style={styles.connectionInfo}>
 
@@ -153,17 +163,23 @@ export default function SettingsScreen() {
 
           <View>
 
-            <Text style={styles.connectionTitle}>
+            <Text style={[styles.connectionTitle, darkMode && styles.darkText]}>
               IoT Gateway
             </Text>
 
-            <Text style={styles.connectionStatus}>
-              Connected
+            <Text style={[styles.connectionStatus, darkMode && styles.darkTextSecondary]}>
+              {gatewayConnected ? 'Connected' : 'IoT Gateway is disconnected.'}
             </Text>
 
           </View>
 
         </View>
+
+        <Button
+          title={gatewayConnecting ? 'Working...' : gatewayConnected ? 'Disconnect' : 'Connect'}
+          disabled={gatewayConnecting}
+          onPress={() => void (gatewayConnected ? disconnectFromGateway() : connectToGateway())}
+        />
 
       </View>
 
@@ -248,6 +264,22 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginLeft: 15,
     marginTop: 3,
+  },
+
+  darkContainer: {
+    backgroundColor: '#101820',
+  },
+
+  darkCard: {
+    backgroundColor: '#1d2a36',
+  },
+
+  darkText: {
+    color: '#f4f7fb',
+  },
+
+  darkTextSecondary: {
+    color: '#b8c7d9',
   },
 
 });

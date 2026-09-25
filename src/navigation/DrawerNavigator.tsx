@@ -7,12 +7,22 @@ import SensorsScreen from './screens/SensorsScreen';
 import DevicesScreen from './screens/DevicesScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import CustomDrawerContent from './CustomDrawerContent';
+import { useIoT } from '../context/IoTContext';
 
 const Drawer = createDrawerNavigator();
 
 export default function DrawerNavigator() {
+  const { darkMode } = useIoT();
+
   return (
     <Drawer.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: darkMode ? '#17232e' : '#ffffff' },
+        headerTintColor: darkMode ? '#f4f7fb' : '#1f2937',
+        drawerStyle: { backgroundColor: darkMode ? '#101820' : '#ffffff' },
+        drawerActiveTintColor: darkMode ? '#7dd3fc' : '#2563eb',
+        drawerInactiveTintColor: darkMode ? '#b8c7d9' : '#4b5563',
+      }}
       drawerContent={(props) => (
         <CustomDrawerContent {...props} />
       )}>
