@@ -13,6 +13,9 @@ export default function DevicesScreen() {
     updatingDeviceId,
     refreshDevices,
     darkMode,
+    gatewayConnecting,
+    gatewayError,
+    connectToGateway,
   } = useIoT();
 
   return (
@@ -20,7 +23,17 @@ export default function DevicesScreen() {
       <Text style={[styles.title, darkMode && styles.darkText]}>Devices</Text>
       <Text style={[styles.subtitle, darkMode && styles.darkTextSecondary]}>Control your connected devices</Text>
 
-      {!gatewayConnected && <Text style={styles.errorText}>IoT Gateway is disconnected.</Text>}
+      {!gatewayConnected && (
+        <View style={[styles.gatewayPanel, darkMode && styles.darkCard]}>
+          <Text style={[styles.gatewayMessage, darkMode && styles.darkText]}>IoT Gateway is disconnected.</Text>
+          <Button
+            title={gatewayConnecting ? 'Connecting...' : 'Connect'}
+            disabled={gatewayConnecting}
+            onPress={() => void connectToGateway()}
+          />
+        </View>
+      )}
+      {gatewayError && <Text style={styles.errorText}>{gatewayError}</Text>}
 
       {devicesLoading ? (
         <View style={styles.feedback}>
@@ -86,4 +99,6 @@ const styles = StyleSheet.create({
   darkCard: { backgroundColor: '#1d2a36' },
   darkText: { color: '#f4f7fb' },
   darkTextSecondary: { color: '#b8c7d9' },
+  gatewayPanel: { borderRadius: 10, backgroundColor: '#fff3df', padding: 12, marginBottom: 14, gap: 8 },
+  gatewayMessage: { color: '#6c4616', fontSize: 13, fontWeight: '600' },
 });

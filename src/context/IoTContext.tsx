@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { Device, sampleDevices, SensorData } from '../models/IoTModels';
 import {
   connectGateway,
@@ -18,6 +18,7 @@ type IoTContextType = {
   sensorsLoading: boolean;
   deviceError: string | null;
   sensorError: string | null;
+  gatewayError: string | null;
   updatingDeviceId: number | null;
   refreshDevices: () => Promise<void>;
   refreshSensors: () => Promise<void>;
@@ -32,12 +33,13 @@ const IoTContext = createContext<IoTContextType | undefined>(undefined);
 export function IoTProvider({ children }: { children: React.ReactNode }) {
   const [devices, setDevices] = useState<Device[]>(sampleDevices);
   const [sensors, setSensors] = useState<SensorData | null>(null);
-  const [devicesLoading, setDevicesLoading] = useState(true);
-  const [sensorsLoading, setSensorsLoading] = useState(true);
+  const [devicesLoading, setDevicesLoading] = useState(false);
+  const [sensorsLoading, setSensorsLoading] = useState(false);
   const [deviceError, setDeviceError] = useState<string | null>(null);
   const [sensorError, setSensorError] = useState<string | null>(null);
-  const [gatewayConnected, setGatewayConnected] = useState(true);
+  const [gatewayConnected, setGatewayConnected] = useState(false);
   const [gatewayConnecting, setGatewayConnecting] = useState(false);
+  const [gatewayError, setGatewayError] = useState<string | null>(null);
   const [darkMode, setDarkMode] = useState(false);
   const [updatingDeviceId, setUpdatingDeviceId] = useState<number | null>(null);
 
@@ -99,11 +101,16 @@ export function IoTProvider({ children }: { children: React.ReactNode }) {
 
   const connectToGateway = async () => {
     setGatewayConnecting(true);
+    setGatewayError(null);
     try {
       await connectGateway();
       setGatewayConnected(true);
       setDeviceError(null);
       setSensorError(null);
+      await Promise.all([refreshDevices(), refreshSensors()]);
+    } catch (error) {
+      setGatewayConnected(false);
+      setGatewayError(error instanceof Error ? error.message : 'Unable to connect to the IoT gateway.');
     } finally {
       setGatewayConnecting(false);
     }
@@ -111,18 +118,22 @@ export function IoTProvider({ children }: { children: React.ReactNode }) {
 
   const disconnectFromGateway = async () => {
     setGatewayConnecting(true);
-    await disconnectGateway();
-    setGatewayConnected(false);
-    setGatewayConnecting(false);
+    setGatewayError(null);
+    try {
+      await disconnectGateway();
+      setGatewayConnected(false);
+      setDeviceError(null);
+      setSensorError(null);
+    } catch (error) {
+      setGatewayError(error instanceof Error ? error.message : 'Unable to disconnect from the IoT gateway.');
+    } finally {
+      setGatewayConnecting(false);
+    }
   };
 
   const toggleDarkMode = (value: boolean) => {
     setDarkMode(value);
   };
-
-  useEffect(() => {
-    void Promise.all([refreshDevices(), refreshSensors()]);
-  }, []);
 
   return (
     <IoTContext.Provider value={{
@@ -135,6 +146,7 @@ export function IoTProvider({ children }: { children: React.ReactNode }) {
       sensorsLoading,
       deviceError,
       sensorError,
+      gatewayError,
       updatingDeviceId,
       refreshDevices,
       refreshSensors,

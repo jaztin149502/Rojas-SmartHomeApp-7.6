@@ -4,12 +4,35 @@ import { Ionicons } from '@expo/vector-icons';
 import { useIoT } from '../../context/IoTContext';
 
 export default function SensorsScreen() {
-  const { sensors, sensorsLoading, sensorError, refreshSensors, darkMode } = useIoT();
+  const {
+    sensors,
+    sensorsLoading,
+    sensorError,
+    refreshSensors,
+    darkMode,
+    gatewayConnected,
+    gatewayConnecting,
+    gatewayError,
+    connectToGateway,
+  } = useIoT();
 
   return (
     <ScrollView style={[styles.container, darkMode && styles.darkContainer]}>
       <Text style={[styles.title, darkMode && styles.darkText]}>Sensors</Text>
       <Text style={[styles.subtitle, darkMode && styles.darkTextSecondary]}>Monitor your environment</Text>
+
+      {!gatewayConnected && (
+        <View style={[styles.feedback, darkMode && styles.darkCard]}>
+          <Text style={darkMode && styles.darkText}>IoT Gateway is disconnected.</Text>
+          <Button
+            title={gatewayConnecting ? 'Connecting...' : 'Connect'}
+            disabled={gatewayConnecting}
+            onPress={() => void connectToGateway()}
+          />
+        </View>
+      )}
+
+      {gatewayError && <Text style={styles.errorText}>{gatewayError}</Text>}
 
       {sensorsLoading && (
         <View style={styles.feedback}>
@@ -31,7 +54,7 @@ export default function SensorsScreen() {
 
       <Button
         title={sensorsLoading ? 'Refreshing Sensors...' : 'Refresh Sensors'}
-        disabled={sensorsLoading}
+        disabled={sensorsLoading || !gatewayConnected}
         onPress={() => void refreshSensors()}
       />
     </ScrollView>

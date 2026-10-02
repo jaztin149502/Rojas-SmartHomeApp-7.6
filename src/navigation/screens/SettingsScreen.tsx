@@ -16,6 +16,7 @@ export default function SettingsScreen() {
   const {
     gatewayConnected,
     gatewayConnecting,
+    gatewayError,
     connectToGateway,
     disconnectFromGateway,
     darkMode,
@@ -97,7 +98,7 @@ export default function SettingsScreen() {
             </Text>
 
             <Text style={[styles.settingDescription, darkMode && styles.darkTextSecondary]}>
-              Automatically connect to the IoT gateway
+              Connection starts only when you press Connect below
             </Text>
 
           </View>
@@ -168,15 +169,19 @@ export default function SettingsScreen() {
             </Text>
 
             <Text style={[styles.connectionStatus, darkMode && styles.darkTextSecondary]}>
-              {gatewayConnected ? 'Connected' : 'IoT Gateway is disconnected.'}
+              {gatewayConnected ? 'Connected and ready' : 'IoT Gateway is disconnected.'}
             </Text>
+
+            {gatewayError && (
+              <Text style={styles.connectionError}>{gatewayError}</Text>
+            )}
 
           </View>
 
         </View>
 
         <Button
-          title={gatewayConnecting ? 'Working...' : gatewayConnected ? 'Disconnect' : 'Connect'}
+          title={gatewayConnecting ? 'Connecting...' : gatewayConnected ? 'Disconnect' : 'Connect'}
           disabled={gatewayConnecting}
           onPress={() => void (gatewayConnected ? disconnectFromGateway() : connectToGateway())}
         />
@@ -264,6 +269,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginLeft: 15,
     marginTop: 3,
+  },
+
+  connectionError: {
+    color: '#b42318',
+    fontSize: 12,
+    marginLeft: 15,
+    marginTop: 6,
   },
 
   darkContainer: {

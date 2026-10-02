@@ -31,10 +31,11 @@ export default function DrawerNavigator() {
         name="Dashboard"
         component={DashboardScreen}
         options={{
-          drawerIcon: ({ size }) => (
+          drawerIcon: ({ size, color }) => (
             <Ionicons
               name="grid-outline"
               size={size}
+              color={color}
             />
           ),
         }}
@@ -44,10 +45,11 @@ export default function DrawerNavigator() {
         name="Sensors"
         component={SensorsScreen}
         options={{
-          drawerIcon: ({ size }) => (
+          drawerIcon: ({ size, color }) => (
             <Ionicons
               name="analytics-outline"
               size={size}
+              color={color}
             />
           ),
         }}
@@ -57,10 +59,11 @@ export default function DrawerNavigator() {
         name="Devices"
         component={DevicesScreen}
         options={{
-          drawerIcon: ({ size }) => (
+          drawerIcon: ({ size, color }) => (
             <Ionicons
               name="hardware-chip-outline"
               size={size}
+              color={color}
             />
           ),
         }}
@@ -70,10 +73,11 @@ export default function DrawerNavigator() {
         name="Settings"
         component={SettingsScreen}
         options={{
-          drawerIcon: ({ size }) => (
+          drawerIcon: ({ size, color }) => (
             <Ionicons
               name="settings-outline"
               size={size}
+              color={color}
             />
           ),
         }}
