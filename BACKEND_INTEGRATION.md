@@ -1,12 +1,31 @@
 # Backend Integration
 
-The app uses the simulated IoT service by default. Set `EXPO_PUBLIC_IOT_API_URL` to the backend origin to use HTTP instead, for example:
+The Expo app calls a PHP API, which reads and writes the `smarthome_iot` MySQL database in Laragon. The API is in `backend/` and implements the endpoints below. The root `.env.local` configures the app to call `http://localhost:8000/api` for local web development.
 
-```env
-EXPO_PUBLIC_IOT_API_URL=http://localhost:3000/api
-```
+## Run Locally
 
-Restart Expo after changing the environment variable. The base URL should not end with a slash.
+1. Start Apache and MySQL in Laragon and import the SQL schema/data you created into `smarthome_iot`. For repeated sample data, apply `backend/migrations/001_unique_devices.sql` once to deduplicate devices. If the sample sensor readings were also inserted multiple times, apply `backend/migrations/002_keep_latest_sensor_seed_batch.sql` once to keep only the newest timestamp batch. The sensor cleanup permanently removes older reading history, so use it only for repeated demo seed data.
+2. In a terminal at the project root, start the PHP API:
+
+	```powershell
+	& 'C:\laragon\bin\php\php-8.3.33-Win32-vs16-x64\php.exe' -S 0.0.0.0:8000 -t backend backend/index.php
+	```
+
+	This uses the Laragon PHP installation with `pdo_mysql` enabled. Adjust the PHP folder if your Laragon version differs.
+
+3. In another terminal, start Expo with the current environment configuration:
+
+	```powershell
+	npx expo start
+	```
+
+Laragon's usual MySQL defaults (host `127.0.0.1`, port `3306`, user `root`, blank password) are used unless overridden with `IOT_DB_HOST`, `IOT_DB_PORT`, `IOT_DB_NAME`, `IOT_DB_USER`, or `IOT_DB_PASSWORD`. Set those variables in the terminal before starting PHP if your MySQL credentials differ. Never put database credentials in `EXPO_PUBLIC_*` variables.
+
+For a physical phone, replace `localhost` in `.env.local` with your computer's LAN IP, for example `http://192.168.1.25:8000/api`, and ensure the phone and computer are on the same network. Android emulators typically use `http://10.0.2.2:8000/api`. Restart Expo after changing `.env.local`.
+
+The gateway connect/disconnect routes currently acknowledge requests only; they do not yet connect to Azure IoT Hub or send commands to an ESP32. Sensor readings are returned from the newest row in `sensor_readings`.
+
+The base URL must not end with a slash.
 
 ## Endpoints
 
